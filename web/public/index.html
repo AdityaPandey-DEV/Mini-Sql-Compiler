@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini SQL Compiler — Interactive Query Validator & Executor</title>
+  <meta name="description" content="An interactive web-based Mini SQL Compiler that validates and executes SQL queries, visualizing every compilation phase: Lexical Analysis, Syntax Analysis, Semantic Analysis, and Query Execution.">
+  <meta property="og:title" content="Mini SQL Compiler — Interactive Web IDE">
+  <meta property="og:description" content="Visualize how a SQL compiler works — from tokenization to execution.">
+  <meta property="og:type" content="website">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header id="app-header">
+    <div class="header-inner">
+      <div class="logo-group">
+        <div class="logo-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="8" fill="url(#logoGrad)"/>
+            <path d="M8 12L16 8L24 12L16 16L8 12Z" fill="white" opacity="0.9"/>
+            <path d="M8 16L16 20L24 16" stroke="white" stroke-width="1.5" opacity="0.7"/>
+            <path d="M8 20L16 24L24 20" stroke="white" stroke-width="1.5" opacity="0.5"/>
+            <defs><linearGradient id="logoGrad" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs>
+          </svg>
+        </div>
+        <div>
+          <h1>Mini SQL Compiler</h1>
+          <p class="subtitle">Interactive Query Validator & Executor</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="btn-schema" class="btn btn-ghost" title="View Database Schema">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M2 3a1 1 0 011-1h10a1 1 0 011 1v1.5a2.5 2.5 0 01-2.5 2.5h-7A2.5 2.5 0 012 4.5V3zm0 6.5A2.5 2.5 0 014.5 7h7A2.5 2.5 0 0114 9.5V11a1 1 0 01-1 1H3a1 1 0 01-1-1V9.5z"/></svg>
+          Schema
+        </button>
+        <button id="btn-history" class="btn btn-ghost" title="Query History">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zM0 8a8 8 0 1116 0A8 8 0 010 8zm8.5-3.5a.5.5 0 00-1 0V8a.5.5 0 00.146.354l2 2a.5.5 0 00.708-.708L8.5 7.793V4.5z"/></svg>
+          History
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== MAIN LAYOUT ===== -->
+  <main id="app-main">
+
+    <!-- LEFT: SQL Editor Panel -->
+    <section id="editor-panel" class="panel">
+      <div class="panel-header">
+        <h2>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5l-2.5 3v9h13v-9l-2.5-3h-8zm0 1h8l1.5 2H2.5L4 2.5zM1.5 5.5h13v7.5h-13v-7.5z"/></svg>
+          SQL Editor
+        </h2>
+        <div class="editor-actions">
+          <select id="example-select" class="select-mini">
+            <option value="">Load Example...</option>
+          </select>
+        </div>
+      </div>
+      <div id="editor-wrapper">
+        <div id="line-numbers"></div>
+        <textarea id="sql-editor" placeholder="-- Type your SQL query here...&#10;SELECT * FROM employees;" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+      </div>
+      <div class="editor-footer">
+        <span id="cursor-info">Ln 1, Col 1</span>
+        <div class="compile-group">
+          <span class="shortcut-hint">Ctrl + Enter</span>
+          <button id="btn-compile" class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2l10 6-10 6V2z"/></svg>
+            Compile & Execute
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: Results Panel -->
+    <section id="results-panel" class="panel">
+      <div class="panel-header">
+        <h2>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M6 3.5A1.5 1.5 0 017.5 2h1A1.5 1.5 0 0110 3.5v1A1.5 1.5 0 018.5 6h-1A1.5 1.5 0 016 4.5v-1zM2 3h3v2H2V3zm0 4h3v2H2V7zm0 4h3v2H2v-2zm5 0h7v2H7v-2zm0-4h7v2H7V7z"/></svg>
+          Compilation Results
+        </h2>
+        <button id="btn-clear-results" class="btn btn-ghost btn-sm">Clear</button>
+      </div>
+
+      <!-- Compiler Pipeline Visualization -->
+      <div id="pipeline-container">
+        <div class="pipeline-phase" id="phase-lexer" data-phase="lexer">
+          <div class="phase-indicator"></div>
+          <div class="phase-info">
+            <span class="phase-number">01</span>
+            <span class="phase-name">Lexical Analysis</span>
+          </div>
+          <div class="phase-status">
+            <span class="status-badge idle">Idle</span>
+          </div>
+        </div>
+        <div class="pipeline-arrow">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+        <div class="pipeline-phase" id="phase-parser" data-phase="parser">
+          <div class="phase-indicator"></div>
+          <div class="phase-info">
+            <span class="phase-number">02</span>
+            <span class="phase-name">Syntax Analysis</span>
+          </div>
+          <div class="phase-status">
+            <span class="status-badge idle">Idle</span>
+          </div>
+        </div>
+        <div class="pipeline-arrow">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+        <div class="pipeline-phase" id="phase-semantic" data-phase="semantic">
+          <div class="phase-indicator"></div>
+          <div class="phase-info">
+            <span class="phase-number">03</span>
+            <span class="phase-name">Semantic Analysis</span>
+          </div>
+          <div class="phase-status">
+            <span class="status-badge idle">Idle</span>
+          </div>
+        </div>
+        <div class="pipeline-arrow">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+        <div class="pipeline-phase" id="phase-execution" data-phase="execution">
+          <div class="phase-indicator"></div>
+          <div class="phase-info">
+            <span class="phase-number">04</span>
+            <span class="phase-name">Query Execution</span>
+          </div>
+          <div class="phase-status">
+            <span class="status-badge idle">Idle</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabbed Detail View -->
+      <div id="detail-tabs">
+        <div class="tab-bar">
+          <button class="tab active" data-tab="tokens">Tokens</button>
+          <button class="tab" data-tab="parse-tree">Parse Tree</button>
+          <button class="tab" data-tab="execution">Results</button>
+          <button class="tab" data-tab="summary">Summary</button>
+        </div>
+        <div id="tab-content">
+          <div class="tab-pane active" id="pane-tokens">
+            <div class="empty-state">
+              <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3"><circle cx="24" cy="24" r="20"/><path d="M16 20l4 4-4 4M24 28h8"/></svg>
+              <p>Run a query to see the token stream</p>
+            </div>
+          </div>
+          <div class="tab-pane" id="pane-parse-tree">
+            <div class="empty-state">
+              <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3"><rect x="18" y="4" width="12" height="8" rx="2"/><rect x="4" y="36" width="12" height="8" rx="2"/><rect x="32" y="36" width="12" height="8" rx="2"/><line x1="24" y1="12" x2="24" y2="24"/><line x1="24" y1="24" x2="10" y2="36"/><line x1="24" y1="24" x2="38" y2="36"/></svg>
+              <p>Run a query to see the parse tree</p>
+            </div>
+          </div>
+          <div class="tab-pane" id="pane-execution">
+            <div class="empty-state">
+              <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3"><rect x="4" y="8" width="40" height="32" rx="3"/><line x1="4" y1="16" x2="44" y2="16"/><line x1="16" y1="16" x2="16" y2="40"/></svg>
+              <p>Run a query to see execution results</p>
+            </div>
+          </div>
+          <div class="tab-pane" id="pane-summary">
+            <div class="empty-state">
+              <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3"><path d="M24 4l6 12 14 2-10 10 2 14-12-6-12 6 2-14L4 18l14-2z"/></svg>
+              <p>Run a query to see the compilation summary</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== ERROR MODAL ===== -->
+  <div id="error-modal-overlay" class="modal-overlay hidden">
+    <div id="error-modal" class="modal">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div id="error-icon" class="error-icon"></div>
+          <div>
+            <h3 id="error-modal-title">Compilation Error</h3>
+            <span id="error-modal-phase" class="error-phase-badge"></span>
+          </div>
+        </div>
+        <button id="btn-close-modal" class="btn-close">&times;</button>
+      </div>
+      <div id="error-modal-body" class="modal-body"></div>
+      <div class="modal-footer">
+        <button id="btn-dismiss-error" class="btn btn-primary">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCHEMA DRAWER ===== -->
+  <div id="schema-drawer-overlay" class="drawer-overlay hidden">
+    <div id="schema-drawer" class="drawer">
+      <div class="drawer-header">
+        <h3>Database Schema</h3>
+        <button id="btn-close-schema" class="btn-close">&times;</button>
+      </div>
+      <div id="schema-content" class="drawer-body"></div>
+    </div>
+  </div>
+
+  <!-- ===== HISTORY DRAWER ===== -->
+  <div id="history-drawer-overlay" class="drawer-overlay hidden">
+    <div id="history-drawer" class="drawer">
+      <div class="drawer-header">
+        <h3>Query History</h3>
+        <button id="btn-close-history" class="btn-close">&times;</button>
+      </div>
+      <div id="history-content" class="drawer-body"></div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/animations.js"></script>
+  <script src="js/error-modal.js"></script>
+  <script src="js/compiler-viz.js"></script>
+  <script src="js/parse-tree.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

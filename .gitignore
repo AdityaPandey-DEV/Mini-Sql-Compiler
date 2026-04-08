@@ -1,0 +1,21 @@
+# Build artifacts
+build/
+*.o
+*.out
+
+# Executable
+sql_compiler
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+
+# Debug files
+*.dSYM/
+node_modules/

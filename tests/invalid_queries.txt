@@ -1,0 +1,60 @@
+# Invalid SQL Queries for Testing
+# ================================
+# These queries should trigger various compiler errors
+
+# ============================================
+# LEXICAL ERRORS
+# ============================================
+
+# Test Case 1: Invalid character @
+SELECT @ FROM users;
+
+# Test Case 2: Invalid character $
+SELECT name$ FROM employees;
+
+# Test Case 3: Unterminated string literal
+SELECT name FROM employees WHERE name = 'John;
+
+# ============================================
+# SYNTAX ERRORS
+# ============================================
+
+# Test Case 4: Missing FROM keyword
+SELECT * employees;
+
+# Test Case 5: Missing semicolon at end
+SELECT * FROM users
+
+# Test Case 6: Missing table name
+SELECT * FROM ;
+
+# Test Case 7: Missing column name after comma
+SELECT name, FROM employees;
+
+# Test Case 8: Missing WHERE condition
+SELECT * FROM users WHERE ;
+
+# Test Case 9: Invalid operator in condition
+SELECT * FROM users WHERE age ! 25;
+
+# Test Case 10: Missing SELECT keyword
+* FROM employees;
+
+# ============================================
+# SEMANTIC ERRORS
+# ============================================
+
+# Test Case 11: Non-existent table
+SELECT * FROM customers;
+
+# Test Case 12: Non-existent column
+SELECT invalid_column FROM employees;
+
+# Test Case 13: Column doesn't exist in specified table
+SELECT budget FROM employees;
+
+# Test Case 14: Multiple invalid columns
+SELECT nonexistent1, nonexistent2 FROM users;
+
+# Test Case 15: Invalid column in WHERE clause
+SELECT name FROM employees WHERE invalid_col = 5;

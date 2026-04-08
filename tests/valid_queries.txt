@@ -1,0 +1,27 @@
+# Valid SQL Queries for Testing
+# ==============================
+# These queries should pass all compiler phases
+
+# Test Case 1: Simple SELECT * query
+SELECT * FROM employees;
+
+# Test Case 2: SELECT with specific columns
+SELECT name, age, salary FROM employees;
+
+# Test Case 3: SELECT with WHERE clause (equality)
+SELECT username, email FROM users WHERE status = active;
+
+# Test Case 4: SELECT with WHERE clause (greater than)
+SELECT name, salary FROM employees WHERE salary > 50000;
+
+# Test Case 5: SELECT with WHERE clause (less than)
+SELECT name, age FROM users WHERE age < 30;
+
+# Test Case 6: SELECT from products table
+SELECT name, price, quantity FROM products;
+
+# Test Case 7: SELECT single column
+SELECT name FROM departments;
+
+# Test Case 8: SELECT with WHERE on string value
+SELECT id, name FROM employees WHERE department = 'Sales';
