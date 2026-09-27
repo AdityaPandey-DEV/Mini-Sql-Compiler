@@ -1,171 +1,55 @@
-# Mini SQL Compiler for Query Validation
+# Mini SQL Compiler
 
-A Compiler Design academic project that validates SQL queries by implementing core compiler phases.
+**Multi-phase SQL compiler with lexer, parser, semantic analyzer, and web-based visualization — built in C++.**
 
-## Project Overview
+![C++](https://img.shields.io/badge/C++-00599C?style=flat-square&logo=cplusplus&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)
+![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white)
 
-This project demonstrates the implementation of a mini compiler that validates SQL SELECT queries without executing them on a real database. It covers all major phases of compilation:
+---
 
-1. **Lexical Analysis** - Tokenizes SQL queries
-2. **Syntax Analysis** - Validates grammar using recursive descent parsing
-3. **Semantic Analysis** - Validates identifiers against a symbol table
-4. **Error Handling** - Generates meaningful error messages
+## What It Does
 
-## Team Members
+A complete SQL compilation pipeline that parses, validates, and analyzes SQL statements — with a web interface for stepping through each phase.
 
-| Member | Responsibility | Files |
-|--------|----------------|-------|
-| Member 1 | Lexical Analyzer | `lexer.h`, `lexer.cpp` |
-| Member 2 | Syntax Analyzer | `parser.h`, `parser.cpp` |
-| Member 3 | Semantic Analyzer & Symbol Table | `semantic.h/cpp`, `symbol_table.h/cpp` |
-| Member 4 | Error Handler, Testing, Documentation | `error_handler.h/cpp`, `main.cpp` |
+**Compilation Phases:**
+1. **Lexer** — tokenizes SQL into keywords, identifiers, literals, operators
+2. **Parser** — builds an Abstract Syntax Tree from token streams
+3. **Semantic Analyzer** — type checking, scope resolution, SQL validity
+4. **Web Visualizer** — interactive UI to step through each phase
 
-## Building the Project
+## Architecture
 
-### Prerequisites
-- G++ compiler with C++17 support
-- Make utility
+```
+SQL Input → Lexer (Token Stream) → Parser (AST) → Semantic Analyzer (Validated AST)
+                                                        → Web Visualizer
+```
 
-### Build Commands
+## Tech Stack
+
+| Component | Technology |
+|---|---|
+| Compiler Core | C++17, Makefile |
+| Web UI | HTML/CSS/JavaScript |
+| Container | Docker |
+| CI/CD | GitHub Actions |
+
+## My Role
+
+I designed the 3-phase compilation pipeline, defined the token categories and grammar rules, and planned the AST node hierarchy. Code generation was accelerated using AI tools; compiler design and testing are mine.
+
+## Quick Start
 
 ```bash
-# Build the project
-make
-
-# Build and run
-make run
-
-# Run demo mode with sample queries
-make demo
-
-# Run automated tests
-make test
-
-# Clean build artifacts
-make clean
+git clone https://github.com/AdityaPandey-DEV/Mini-Sql-Compiler.git && cd Mini-Sql-Compiler
+make build && ./mini-sql-compiler
+# Or with Docker: docker build -t mini-sql . && docker run -p 8080:8080 mini-sql
 ```
 
-## Usage
+---
 
-### Interactive Mode
-```bash
-./sql_compiler
-```
+<div align="center">
 
-Then type SQL queries at the `sql>` prompt:
-```sql
-sql> SELECT * FROM employees;
-sql> SELECT name, age FROM users WHERE age > 25;
-sql> exit
-```
+*Architected & built by [Aditya Pandey](https://github.com/AdityaPandey-DEV) — AI-augmented development*
 
-### Demo Mode
-```bash
-./sql_compiler --demo
-```
-
-### Pipe Mode
-```bash
-echo "SELECT * FROM employees;" | ./sql_compiler
-```
-
-## Supported SQL Syntax
-
-```sql
-SELECT column1, column2, ... | *
-FROM table_name
-[WHERE column operator value]
-;
-```
-
-### Supported Operators
-- `=` (equality)
-- `<` (less than)
-- `>` (greater than)
-
-### Available Tables (Simulated Schema)
-
-| Table | Columns |
-|-------|---------|
-| employees | id, name, age, salary, department |
-| departments | id, name, budget |
-| users | id, username, email, age, status |
-| products | id, name, price, quantity |
-
-## Project Structure
-
-```
-compiler/
-├── include/
-│   ├── common.h          # Shared types and structures
-│   ├── lexer.h           # Lexer declarations
-│   ├── parser.h          # Parser declarations
-│   ├── semantic.h        # Semantic analyzer declarations
-│   ├── symbol_table.h    # Symbol table declarations
-│   └── error_handler.h   # Error handler declarations
-├── src/
-│   ├── main.cpp          # Main driver program
-│   ├── lexer.cpp         # Lexer implementation
-│   ├── parser.cpp        # Parser implementation
-│   ├── semantic.cpp      # Semantic analyzer implementation
-│   ├── symbol_table.cpp  # Symbol table implementation
-│   └── error_handler.cpp # Error handler implementation
-├── tests/
-│   ├── valid_queries.txt
-│   └── invalid_queries.txt
-├── docs/
-│   ├── PROJECT_REPORT.md
-│   ├── VIVA_QUESTIONS.md
-│   └── SAMPLE_OUTPUTS.md
-├── Makefile
-└── README.md
-```
-
-## Sample Output
-
-### Valid Query
-```
-sql> SELECT name, age FROM employees WHERE age > 25;
-
-========================================
-   PHASE 1: LEXICAL ANALYSIS
-========================================
-Input Query: SELECT name, age FROM employees WHERE age > 25;
-
-Lexical Analysis: SUCCESS
-Total Tokens Generated: 11
-
-========================================
-   PHASE 2: SYNTAX ANALYSIS
-========================================
-Syntax Analysis: SUCCESS
-Parse Tree constructed successfully.
-
-========================================
-   PHASE 3: SEMANTIC ANALYSIS
-========================================
-Semantic Analysis: SUCCESS
-All identifiers resolved correctly.
-
-╔═══════════════════════════════════════╗
-║   QUERY VALIDATION: SUCCESSFUL        ║
-╚═══════════════════════════════════════╝
-```
-
-## Error Examples
-
-### Syntax Error
-```
-Input: SELECT * employees;
-Error: Syntax Error at Line 1, Column 10: Expected 'FROM' keyword
-```
-
-### Semantic Error
-```
-Input: SELECT * FROM customers;
-Error: Semantic Error: Table 'customers' does not exist
-```
-
-## License
-
-This is an academic project for the Compiler Design course.
+</div>
